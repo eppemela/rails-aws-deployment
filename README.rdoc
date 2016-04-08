@@ -1,28 +1,68 @@
-== README
+== Deploy a Rails App on Amazon AWS
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+First of all edit your ```config/database.yml``` with this settings for the production database:
 
-Things you may want to cover:
+```
+production:
+    <<: *default
+    adapter: postgresql
+    encoding: unicode
+    database: <%= ENV['RDS_DB_NAME'] %>
+    username: <%= ENV['RDS_USERNAME'] %>
+    password: <%= ENV['RDS_PASSWORD'] %>
+    host: <%= ENV['RDS_HOSTNAME'] %>
+    port: <%= ENV['RDS_PORT'] %>
+```
 
-* Ruby version
+Then add puma to your Gemfile.
 
-* System dependencies
+```
+echo "gem 'puma' >> Gemfile "
+bundle install
+```
 
-* Configuration
+Initialize a new beanstalk app through the eb command.
 
-* Database creation
+In case you don't have the eb-cli install with:
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+```
+brew install awsebcli
+```
+then
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+```
+eb init
+```
+When prompted select 5 for Eu-central or 4 for eu-west **default region**.
+Next, provide your access key and secret key so that the EB CLI can manage resources for you. Access keys are created in the AWS Identity and Access Management management console. If you don't have keys, see [How Do I Get Security Credentials?](http://docs.aws.amazon.com/general/latest/gr/getting-aws-sec-creds.html) in the Amazon Web Services General Reference.
+Remember also to add *AWSElasticBeanstalkFullAccess* Policy to the IAM User you intend to use.
+
+You'll then be prompted with some other questions:
+
+```
+EIt appears you are using Ruby. Is this correct?
+(y/n): y
+
+Select a platform version.
+1) Ruby 2.3 (Puma)
+
+Do you want to set up SSH for your instances?
+(y/n): n
+```
+
+You should now see a **.elasticbeanstalk** directory in the root of your project with a **config.yml** file. Which was also automatically added into the **.gitignore** file for you.
+
+```
+branch-defaults:
+  master:
+    environment: null
+    group_suffix: null
+global:
+  application_name: amazon_aws_deploy_test
+  default_ec2_keyname: null
+  default_platform: Ruby 2.3 (Puma)
+  default_region: eu-central-1
+  profile: eb-cli
+  sc: git
+```
