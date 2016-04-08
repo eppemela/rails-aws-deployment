@@ -1,4 +1,4 @@
-== Deploy a Rails App on Amazon AWS ElasticBeanStalk
+## Deploy a Rails App on Amazon AWS ElasticBeanStalk
 
 First of all edit your ```config/database.yml``` with this settings for the production database:
 
@@ -93,4 +93,10 @@ Almost done. Create a folder named **.ebextensions** in the top level of our app
 packages:
     yum:
       postgresql93-devel: []
+```
+
+And finally:
+
+```
+eb deploy
 ```
