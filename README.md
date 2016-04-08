@@ -1,4 +1,4 @@
-== Deploy a Rails App on Amazon AWS
+== Deploy a Rails App on Amazon AWS ElasticBeanStalk
 
 First of all edit your ```config/database.yml``` with this settings for the production database:
 
@@ -65,4 +65,32 @@ global:
   default_region: eu-central-1
   profile: eb-cli
   sc: git
+```
+
+Now let's setup our environments and run, in our example app_name is *amazon-aws-deploy-test*
+
+```
+eb create [app_name] --service-role aws-elasticbeanstalk-ec2-role
+```
+
+Check that everything went well with:
+```
+eb status
+```
+Now, lets add our **SECRET_KEY_BASE** environment variable by running **rake secret**
+
+```
+rake secret
+```
+In order to save this secret key in the elastic beanstalk env run **eb setenv [YOUR_SECRET_KEY_BASE]**
+```
+eb setenv SECRET_KEY_BASE=17ce7f0fa59ff47be20593462cd3dc0fb8f058d2f792d923b5f9d20959e018c87d5878dbeedd2b839571ab0aa79a0df65fae67c3750db3d322a30d6b67e538f1
+```
+Once the configuration is deployed successfull go to the [Elastic beanstalk console]( https://console.aws.amazon.com/elasticbeanstalk/home), click on the app name and then **configuration**, look for **data tier** and click on **create a new RDS database**, set the DB engine to **postgres** and create a **master username** and a **master password**, then click **Apply**.
+
+Almost done. Create a folder named **.ebextensions** in the top level of our app with a **package.config** file in which we will add the **postgressql93-devel**
+```
+packages:
+    yum:
+      postgresql93-devel: []
 ```
